@@ -22,7 +22,10 @@ This project delivers a robust, scalable end-to-end data pipeline for a rental m
 - **`images/`**: Includes visual aids.
   - **`images/`**: Includes visual aids.
   - `redshift_data.png`
-  - step function diagram
+  - `step_function.png`
+  - `redshiftdata1.png`
+  - `redshiftdata2.png`
+  - `redshiftdata3.png`
 
 
 ## Workflow Description
@@ -33,7 +36,7 @@ The pipeline is orchestrated via AWS Step Functions, as depicted in the ![Archit
 3. **Transform and Load to Curated Layer**: Transforms raw data (e.g., converting `has_photo` to BOOLEAN, `viewed_at` to DATE) and loads it into Curated layer tables.
 4. **Compute Presentation Layer**: Populates analytics tables with business metrics using aggregated queries.
 5. **Error Handling**: Includes catch blocks for retries and a `FailSafeHandler` to manage failures, ensuring workflow resilience.
-6. ![Architecture Diagram](images/step_function.png)
+![Architecture Diagram](images/step_function.png)
 
 ## Redshift Multi-Layer Architecture
 
@@ -53,11 +56,11 @@ Defined in `curated_layer.sql` with transformations and constraints:
 
 ### Presentation Layer
 Defined in `presentation_layer_tables.sql` to support analytical reporting with the following KPIs:
-- **avg_listing_price_weekly**: Tracks the average price of active rental listings on a weekly basis.
+- **avg_listing_price_weekly**: Tracks the average price of active rental listings every week.
 - **occupancy_rate_monthly**: Measures the percentage of available rental nights booked each month.
 - **most_popular_locations_weekly**: Identifies the top cities with the highest booking frequency per week.
 - **top_performing_listings_weekly**: Highlights properties generating the highest weekly revenue.
-- **total_bookings_per_user_weekly**: Counts the number of bookings per user on a weekly basis.
+- **total_bookings_per_user_weekly**: Counts the number of bookings per user every week.
 - **avg_booking_duration_weekly**: Calculates the average duration of confirmed stays each week.
 - **repeat_customer_rate_weekly**: Assesses the percentage of users booking more than once within a 30-day rolling period.
 
@@ -74,7 +77,7 @@ Defined in `presentation_layer_tables.sql` to support analytical reporting with 
    - Configure Glue connections: "Aurora connection" for MySQL and "Redshift connection" with temporary directory `s3://aws-glue-assets-814724283777-us-east-1/temporary/`.
    - Create and test Glue jobs in the AWS Console.
 4. **Step Function**:
-   - Deploy the Step Function using the ![Step Function Definition](/stepfunction.json) as a reference.
+   - Deploy the Step Function using the `stepfunction.json` as a reference.
    - Define states for Glue job triggers, catch blocks, and fail-safe handling.
 5. **Scheduling**:
    - Schedule the Step Function via CloudWatch Events for daily execution at 05:00 AM GMT.
