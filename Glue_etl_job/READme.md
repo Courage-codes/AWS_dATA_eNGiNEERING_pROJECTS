@@ -33,6 +33,7 @@ The pipeline is orchestrated via AWS Step Functions, as depicted in the ![Archit
 3. **Transform and Load to Curated Layer**: Transforms raw data (e.g., converting `has_photo` to BOOLEAN, `viewed_at` to DATE) and loads it into Curated layer tables.
 4. **Compute Presentation Layer**: Populates analytics tables with business metrics using aggregated queries.
 5. **Error Handling**: Includes catch blocks for retries and a `FailSafeHandler` to manage failures, ensuring workflow resilience.
+6. ![Architecture Diagram](images/step_function.png)
 
 ## Redshift Multi-Layer Architecture
 
@@ -73,7 +74,7 @@ Defined in `presentation_layer_tables.sql` to support analytical reporting with 
    - Configure Glue connections: "Aurora connection" for MySQL and "Redshift connection" with temporary directory `s3://aws-glue-assets-814724283777-us-east-1/temporary/`.
    - Create and test Glue jobs in the AWS Console.
 4. **Step Function**:
-   - Deploy the Step Function using the [Step Function Definition](https://example.com/stepfunction.txt) as a reference.
+   - Deploy the Step Function using the ![Step Function Definition](/stepfunction.json) as a reference.
    - Define states for Glue job triggers, catch blocks, and fail-safe handling.
 5. **Scheduling**:
    - Schedule the Step Function via CloudWatch Events for daily execution at 05:00 AM GMT.
@@ -88,10 +89,3 @@ Defined in `presentation_layer_tables.sql` to support analytical reporting with 
 - **Performance**: Redshift tables use DISTSTYLE AUTO/KEY and SORTKEY for query optimization.
 - **Scalability**: Glue jobs coalesce data to single partitions when row counts exceed 1, balancing load.
 - **Security**: IAM roles and encrypted S3 storage (snappy compression) protect data integrity.
-
-## Future Improvements
-- Implement incremental ETL using timestamps (e.g., `last_modified_timestamp`) to reduce processing overhead.
-- Add comprehensive monitoring with CloudWatch Alarms for pipeline health.
-- Extend data quality rules to include column value range checks.
-
-*Last Updated: 05:07 AM GMT, Thursday, June 19, 2025*
