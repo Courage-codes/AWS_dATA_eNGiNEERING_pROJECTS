@@ -1,0 +1,119 @@
+{
+  "Comment": "Run Glue jobs extract_Aurora_S3 -> extract_s3_redshift -> transform_and_load -> kpi_computation with fail-safe",
+  "StartAt": "extract_Aurora_S3",
+  "States": {
+    "extract_Aurora_S3": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::glue:startJobRun.sync",
+      "Parameters": {
+        "JobName": "extract_Aurora_S3"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Glue.JobRunException",
+            "States.Timeout"
+          ],
+          "IntervalSeconds": 5,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "FailSafeHandler"
+        }
+      ],
+      "Next": "extract_s3_redshift"
+    },
+    "extract_s3_redshift": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::glue:startJobRun.sync",
+      "Parameters": {
+        "JobName": "extract_s3_redshift"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Glue.JobRunException",
+            "States.Timeout"
+          ],
+          "IntervalSeconds": 5,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "FailSafeHandler"
+        }
+      ],
+      "Next": "transform_and_load"
+    },
+    "transform_and_load": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::glue:startJobRun.sync",
+      "Parameters": {
+        "JobName": "transform_and_load"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Glue.JobRunException",
+            "States.Timeout"
+          ],
+          "IntervalSeconds": 5,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "FailSafeHandler"
+        }
+      ],
+      "Next": "kpi_computation"
+    },
+    "kpi_computation": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::glue:startJobRun.sync",
+      "Parameters": {
+        "JobName": "kpi_computation"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Glue.JobRunException",
+            "States.Timeout"
+          ],
+          "IntervalSeconds": 5,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "FailSafeHandler"
+        }
+      ],
+      "End": true
+    },
+    "FailSafeHandler": {
+      "Type": "Fail",
+      "Error": "GlueJobFailed",
+      "Cause": "One of the Glue jobs failed after retries"
+    }
+  }
+}
